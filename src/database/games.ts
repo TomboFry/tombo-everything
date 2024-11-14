@@ -10,7 +10,7 @@ import {
 	shortDate,
 } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { type Parameters, calculateCreatedAt, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 import { getGameAchievementsForSession } from './gameachievements.js';
 
@@ -43,15 +43,11 @@ export function insertNewGameActivity(game: Insert<Game>) {
 		($id, $name, $playtime_mins, $url, $created_at, $updated_at, $device_id)`,
 	);
 
-	const created_at = game.created_at
-		? dateDefault(game.created_at)
-		: new Date(Date.now() - game.playtime_mins * minuteMs).toISOString();
-
 	const result = statement.run({
 		...game,
 		id,
-		created_at,
-		updated_at: new Date().toISOString(),
+		created_at: dateDefault(game.created_at, Date.now() - game.playtime_mins * minuteMs),
+		updated_at: dateDefault(),
 	});
 
 	return {
@@ -91,7 +87,7 @@ export function updateActivity(game: Omit<Game, 'id' | 'created_at' | 'updated_a
 	const result = updateStatement.run({
 		id: row.id,
 		playtime_mins: row.playtime_mins + game.playtime_mins,
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(),
 	});
 
 	return {
@@ -135,7 +131,7 @@ export function getGameActivityByDay(days = 7) {
 
 	return statement
 		.all({
-			created_at: new Date(Date.now() - days * dayMs).toISOString(),
+			created_at: calculateCreatedAt(days),
 		})
 		.map(row => ({
 			...row,
@@ -271,7 +267,7 @@ export function getPopularGames(days: number, limit = 10) {
 		LIMIT $limit`,
 	);
 
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
+	const created_at = calculateCreatedAt(days);
 	const rows = statement.all({ created_at, limit });
 
 	return rows.map(row => ({

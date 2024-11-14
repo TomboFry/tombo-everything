@@ -8,6 +8,7 @@ const log = new Logger('ListenBrainz');
 export interface ListenBrainzPayload {
 	listen_type: 'playing_now' | 'single' | 'import';
 	payload: {
+		/** Unix timestamp in seconds, when the song was listened to */
 		listened_at: number;
 		track_metadata: {
 			artist_name: string;

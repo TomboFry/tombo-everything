@@ -1,8 +1,6 @@
 import { v4 as uuid } from 'uuid';
-import { timeago } from '../adapters/timeago.js';
 import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface GameAchievement {
@@ -28,23 +26,8 @@ export function insertNewGameAchievement(achievement: Insert<GameAchievement>) {
 		...achievement,
 		id: uuid(),
 		created_at: dateDefault(achievement.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(),
 	});
-}
-
-export function getGameAchievement(parameters: Partial<Parameters> = {}) {
-	const statement = getStatement<GameAchievement>(
-		'getGameAchievement',
-		`SELECT * FROM gameachievements
-		WHERE id LIKE $id AND created_at >= $created_at
-		ORDER BY updated_at DESC
-		LIMIT $limit OFFSET $offset`,
-	);
-
-	return statement.all(calculateGetParameters(parameters)).map(row => ({
-		...row,
-		timeago: timeago.format(new Date(row.created_at)),
-	}));
 }
 
 export function getGameAchievementsForSession(game_id: string) {

@@ -53,7 +53,7 @@ export function insertNote(note: Insert<Entry>) {
 		...note,
 		id: uuid(),
 		created_at: dateDefault(note.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(),
 	});
 }
 
@@ -129,6 +129,6 @@ export function updateNote(note: Update<Entry>) {
 	return statement.run({
 		...note,
 		created_at: dateDefault(note.created_at),
-		updated_at: note.updated_at || new Date().toISOString(),
+		updated_at: dateDefault(note.updated_at),
 	});
 }

@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault, dayMs } from '../lib/formatDate.js';
+import { dateDefault } from '../lib/formatDate.js';
 import type { Insert, Optional, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { type Parameters, calculateCreatedAt, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
 interface YouTubeLike {
@@ -88,7 +88,7 @@ export function getPopularYouTubeChannels(days: number, limit = 10) {
 		LIMIT $limit`,
 	);
 
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
+	const created_at = calculateCreatedAt(days);
 	const rows = statement.all({ created_at, limit });
 
 	return rows.map(row => ({

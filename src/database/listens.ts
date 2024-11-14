@@ -1,8 +1,8 @@
 import { v4 as uuid } from 'uuid';
 import { timeago } from '../adapters/timeago.js';
-import { dateDefault, dayMs, hourMs, shortDate } from '../lib/formatDate.js';
+import { dateDefault, hourMs, shortDate } from '../lib/formatDate.js';
 import type { Insert, Optional, Select, Update } from '../types/database.js';
-import { type Parameters, calculateGetParameters } from './constants.js';
+import { type Parameters, calculateCreatedAt, calculateGetParameters } from './constants.js';
 import { getStatement } from './database.js';
 
 export interface ListenTrack {
@@ -213,8 +213,7 @@ export function getListensPopular(days: number) {
 		LIMIT 30`,
 	);
 
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
-	const rows = statement.all({ created_at });
+	const rows = statement.all({ created_at: calculateCreatedAt(days) });
 
 	return rows.map(row => ({
 		...row,
@@ -234,7 +233,7 @@ export function getListenPopularDashboard(days: number) {
 			LIMIT 1;`,
 		);
 
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
+	const created_at = calculateCreatedAt(days);
 
 	const artist = generateStatement('artist').get({ created_at });
 	const album = generateStatement('album').get({ created_at });
@@ -294,9 +293,7 @@ export function getPopularAlbumWithArtist(days = 14) {
 		LIMIT 1;`,
 	);
 
-	const created_at = new Date(Date.now() - days * dayMs).toISOString();
-
-	return statement.get({ created_at });
+	return statement.get({ created_at: calculateCreatedAt(days) });
 }
 
 export function getTracksWithMissingMetadata() {

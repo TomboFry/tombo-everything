@@ -123,14 +123,14 @@ function getPostMetadata(item: FeedItem): Partial<Entry> {
 				if (post.record.embed.images.length === 0) break;
 				const blobUrl = getBlobUrl(
 					post.author.did,
-					post.record.embed.images[0]!.image.ref.$link,
+					post.record.embed.images[0].image.ref.$link,
 				);
-				const altText = post.record.embed.images[0]!.alt;
+				const altText = post.record.embed.images[0].alt;
 				metadata.description = `<img class='u-photo' src='${blobUrl}' alt='${altText}' />${metadata.description}`;
 				break;
 			}
 			case 'app.bsky.embed.video': {
-				const blobUrl = getBlobUrl(post.author.did, post.record.embed!.video.ref.$link);
+				const blobUrl = getBlobUrl(post.author.did, post.record.embed.video.ref.$link);
 				metadata.description = `<video class='u-video' src='${blobUrl}' controls></video>${metadata.description}`;
 			}
 		}
@@ -158,7 +158,7 @@ function getPostMetadata(item: FeedItem): Partial<Entry> {
 				break;
 			}
 
-			metadata.url = getBlobUrl(post.author.did, post.record.embed.images[0]!.image.ref.$link);
+			metadata.url = getBlobUrl(post.author.did, post.record.embed.images[0].image.ref.$link);
 			metadata.type = 'photo';
 			return metadata;
 		}

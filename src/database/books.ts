@@ -37,8 +37,8 @@ export function insertBook(book: Insert<Book>): RunResult {
 		id: uuid(),
 		started_at: dateDefault(book.started_at),
 		created_at: dateDefault(book.created_at),
-		completed_at: book.completed_at ? new Date(book.completed_at).toISOString() : null,
-		updated_at: new Date().toISOString(),
+		completed_at: dateDefault(book.completed_at, null),
+		updated_at: dateDefault(),
 	});
 }
 
@@ -120,6 +120,6 @@ export function updateBook(book: Partial<Book>) {
 		completed_at: completed_calculated,
 		started_at: dateDefault(book.started_at),
 		created_at: dateDefault(book.created_at),
-		updated_at: new Date().toISOString(),
+		updated_at: dateDefault(),
 	});
 }

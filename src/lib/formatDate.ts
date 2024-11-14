@@ -113,7 +113,7 @@ export function isoDuration(durationMs: number) {
 	return output;
 }
 
-export function getStartOfDay(date = new Date()) {
+export function getStartOfDay(date = new Date()): Date {
 	return new Date(`${formatDate(date)}T00:00:00.000Z`);
 }
 
@@ -130,6 +130,18 @@ export function isSameDate(dateA: Date, dateB: Date) {
 	return true;
 }
 
-export function dateDefault(input: string | number | Date | undefined | null) {
-	return new Date(input || Date.now()).toISOString();
+/**  */
+export function dateDefault(
+	input?: string | Date | number | null,
+	fallback: string | Date | number | null = Date.now(),
+): string | null {
+	if (input) {
+		return new Date(input).toISOString();
+	}
+
+	if (fallback) {
+		return new Date(fallback).toISOString();
+	}
+
+	return null;
 }

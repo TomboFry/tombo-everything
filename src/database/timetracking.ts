@@ -45,7 +45,7 @@ function insertNewRecord(session: Insert<Timetracking>) {
 		...session,
 		id: uuid(),
 		created_at: dateDefault(session.created_at),
-		ended_at: session.ended_at ? new Date(session.ended_at).toISOString() : null,
+		ended_at: dateDefault(session.ended_at, null),
 	});
 }
 
