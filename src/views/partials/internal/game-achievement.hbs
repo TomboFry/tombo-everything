@@ -6,6 +6,7 @@
 		{{> internal/crudRow emoji="🎮" name="name" value=data.name }}
 		{{> internal/crudRow emoji="📓" name="description" value=data.description }}
 		{{> internal/crudRow emoji="🕗" name="created_at" value=data.created_at }}
+		{{> internal/crudRow emoji="🕗" name="updated_at" value=data.updated_at }}
 		{{#unless data.id}}
 			<input type="hidden" name="crudType" value="new" />
 		{{/unless}}

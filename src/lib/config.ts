@@ -53,14 +53,14 @@ export const config = {
 		dataPath: resolve(process.env.TOMBOIS_STEAM_DATA_FILE ?? 'data/steam-activity.json'),
 		apiKey: process.env.TOMBOIS_STEAM_APIKEY,
 		userId: process.env.TOMBOIS_STEAM_USERID,
-		steamDeviceId: process.env.TOMBOIS_STEAM_DEVICE_ID,
+		steamDeviceId: process.env.TOMBOIS_STEAM_DEVICE_ID || process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 		pollIntervalMinutes: Number(process.env.TOMBOIS_STEAM_POLL_INTERVAL ?? 20),
 	},
 
 	psn: {
 		dataPath: resolve(process.env.TOMBOIS_PSN_DATA_FILE ?? 'data/psn-activity.json'),
 		npsso: process.env.TOMBOIS_PSN_NPSSO,
-		deviceId: process.env.TOMBOIS_PSN_DEVICE_ID,
+		deviceId: process.env.TOMBOIS_PSN_DEVICE_ID || process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 		pollInterval: Number(process.env.TOMBOIS_PSN_POLL_INTERVAL ?? 5),
 	},
 
@@ -68,7 +68,7 @@ export const config = {
 		apiKey: process.env.TOMBOIS_RETROACHIEVEMENTS_APIKEY,
 		username: process.env.TOMBOIS_RETROACHIEVEMENTS_USERNAME,
 		pollInterval: Number(process.env.TOMBOIS_RETROACHIEVEMENTS_POLL_INTERVAL ?? 60),
-		deviceId: process.env.TOMBOIS_RETROACHIEVEMENTS_DEVICE_ID,
+		deviceId: process.env.TOMBOIS_RETROACHIEVEMENTS_DEVICE_ID || process.env.TOMBOIS_DEFAULT_DEVICE_ID,
 	},
 
 	bluesky: {

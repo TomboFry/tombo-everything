@@ -5,11 +5,11 @@ import {
 	updateGameAchievement,
 } from '../../database/gameachievements.js';
 import {
-	countGameActivity,
-	deleteGameActivity,
-	getGameActivity,
-	insertNewGameActivity,
-	updateGameActivity,
+	countGameSessions,
+	deleteGameSession,
+	getGameSessions,
+	insertGameSession,
+	updateGameSessionInternal,
 } from '../../database/games.js';
 import { config } from '../../lib/config.js';
 import handlebarsPagination from '../../lib/handlebarsPagination.js';
@@ -21,9 +21,9 @@ const router = express.Router();
 
 router.get('/', (req: RequestFrontend, res) => {
 	const { page = 0 } = req.query;
-	const pagination = handlebarsPagination(page, countGameActivity());
+	const pagination = handlebarsPagination(page, countGameSessions());
 
-	const games = getGameActivity({ page });
+	const games = getGameSessions({ page });
 
 	res.render('internal/games', { games, pagination });
 });
@@ -33,11 +33,12 @@ router.get('/', (req: RequestFrontend, res) => {
 router.post('/', (req: RequestFrontend, res) => {
 	const { name, playtime_mins, url, created_at } = req.body;
 
-	insertNewGameActivity({
+	insertGameSession({
 		name,
-		device_id: config.defaultDeviceId,
-		playtime_mins: Number(playtime_mins || 0),
 		url,
+
+		playtime_mins: Number(playtime_mins || 0),
+		device_id: config.defaultDeviceId,
 		created_at,
 	});
 	res.redirect('/games');
@@ -49,12 +50,12 @@ router.post('/:id', (req: RequestFrontend, res) => {
 
 	switch (crudType) {
 		case 'delete': {
-			deleteGameActivity(id);
+			deleteGameSession(id);
 			break;
 		}
 
 		case 'update': {
-			updateGameActivity({
+			updateGameSessionInternal({
 				id,
 				name,
 				playtime_mins: Number(playtime_mins || 0),
@@ -78,7 +79,7 @@ router.post('/:id', (req: RequestFrontend, res) => {
 router.get('/:id/achievements', (req, res) => {
 	const { id } = req.params;
 
-	const [game] = getGameActivity({ id });
+	const [game] = getGameSessions({ id });
 
 	if (!game) {
 		res.redirect('/games');
@@ -88,14 +89,14 @@ router.get('/:id/achievements', (req, res) => {
 	res.render('internal/game-achievements', { id, game, achievements: game.achievements.length });
 });
 
-router.post('/:game_id/achievements', (req: RequestFrontend, res) => {
-	const { game_id } = req.params;
-	const { id, crudType, name, description, created_at } = req.body;
+router.post('/:unlocked_session_id/achievements', (req: RequestFrontend, res) => {
+	const { unlocked_session_id } = req.params;
+	const { id, crudType, name, description, created_at, updated_at } = req.body;
 
-	const [game] = getGameActivity({ id: game_id });
+	const [game] = getGameSessions({ id: unlocked_session_id });
 
 	if (!game) {
-		res.redirect(`/games/${game_id}/achievements`);
+		res.redirect(`/games/${unlocked_session_id}/achievements`);
 		return;
 	}
 
@@ -104,8 +105,8 @@ router.post('/:game_id/achievements', (req: RequestFrontend, res) => {
 			insertNewGameAchievement({
 				name,
 				description,
-				game_name: game.name,
-				game_id,
+				game_id: game.game_id,
+				unlocked_session_id,
 				device_id: config.defaultDeviceId,
 				created_at,
 			});
@@ -118,7 +119,7 @@ router.post('/:game_id/achievements', (req: RequestFrontend, res) => {
 		}
 
 		case 'update': {
-			updateGameAchievement({ id, name, description, created_at });
+			updateGameAchievement({ id, name, description, created_at, updated_at });
 			break;
 		}
 
@@ -127,7 +128,7 @@ router.post('/:game_id/achievements', (req: RequestFrontend, res) => {
 			break;
 	}
 
-	res.redirect(`/games/${game_id}/achievements`);
+	res.redirect(`/games/${unlocked_session_id}/achievements`);
 });
 
 export default router;

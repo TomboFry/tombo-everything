@@ -1,6 +1,6 @@
 import phin from 'phin';
 import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import { updateGameSession } from '../database/games.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -101,7 +101,7 @@ export function pollForRetroAchievementsActivity() {
 	const fetchGames = async () => {
 		log.info('Polling RetroAchievements for new game activity');
 		const recentlyPlayedGames = await fetchRecentlyPlayedGames();
-		const recentlyInsertedGames: { id: string; gameId: number }[] = [];
+		const recentlyInsertedGames: { id: string; game_id: number; raGameId: number }[] = [];
 
 		for (const game of recentlyPlayedGames) {
 			const lastPlayed = parseDateTime(game.LastPlayed);
@@ -114,7 +114,7 @@ export function pollForRetroAchievementsActivity() {
 
 			log.info(`Logging '${game.Title}' for ${playtime_mins} minutes`);
 
-			const gameActivity = updateActivity(
+			const gameActivity = updateGameSession(
 				{
 					device_id: insertDeviceId,
 					name: game.Title,
@@ -126,7 +126,8 @@ export function pollForRetroAchievementsActivity() {
 
 			recentlyInsertedGames.push({
 				id: gameActivity.id,
-				gameId: game.GameID,
+				game_id: gameActivity.game_id,
+				raGameId: game.GameID,
 			});
 		}
 
@@ -137,7 +138,7 @@ export function pollForRetroAchievementsActivity() {
 		const recentAchievements = await fetchRecentAchievements();
 
 		for (const achievement of recentAchievements) {
-			const game = recentlyInsertedGames.find(game => game.gameId === achievement.GameID);
+			const game = recentlyInsertedGames.find(game => game.raGameId === achievement.GameID);
 
 			// NOTE: Achievement found for a game not recently played?
 			if (!game) continue;
@@ -149,8 +150,8 @@ export function pollForRetroAchievementsActivity() {
 				description: achievement.Description,
 				created_at: parseDateTime(achievement.Date).toISOString(),
 				device_id: insertDeviceId,
-				game_id: game.id,
-				game_name: achievement.GameTitle,
+				unlocked_session_id: game.id,
+				game_id: game.game_id,
 			});
 		}
 	};

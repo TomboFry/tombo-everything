@@ -17,7 +17,7 @@ const {
 } = createRequire(import.meta.url)('psn-api');
 
 import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import { updateGameSession } from '../database/games.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -217,7 +217,7 @@ async function fetchGameActivity() {
 			log.info(`${newTrophies.length} new trophies for ${game.titleName}`);
 		}
 
-		const activity = updateActivity(
+		const activity = updateGameSession(
 			{
 				name: game.titleName,
 				playtime_mins: config.psn.pollInterval,
@@ -231,8 +231,8 @@ async function fetchGameActivity() {
 			insertNewGameAchievement({
 				name: trophy.trophyName,
 				description: trophy.trophyDetail,
-				game_name: game.titleName,
-				game_id: activity.id,
+				game_id: activity.game_id,
+				unlocked_session_id: activity.id,
 				device_id,
 				created_at: '',
 			});

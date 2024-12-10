@@ -1,7 +1,7 @@
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import phin from 'phin';
 import { insertNewGameAchievement } from '../database/gameachievements.js';
-import { updateActivity } from '../database/games.js';
+import { updateGameSession } from '../database/games.js';
 import { config } from '../lib/config.js';
 import { minuteMs } from '../lib/formatDate.js';
 import Logger from '../lib/logger.js';
@@ -195,7 +195,7 @@ export function pollForGameActivity() {
 
 		// Update all new same-game activity
 		for (const game of newActivity) {
-			const activity = updateActivity(
+			const activity = updateGameSession(
 				{
 					name: game.name,
 					playtime_mins: game.newPlaytime,
@@ -211,8 +211,8 @@ export function pollForGameActivity() {
 				insertNewGameAchievement({
 					name: achievement.name,
 					description: achievement.description || null,
-					game_name: game.name,
-					game_id: activity.id,
+					game_id: activity.game_id,
+					unlocked_session_id: activity.id,
 					device_id,
 					created_at: '',
 				});
@@ -226,6 +226,8 @@ export function pollForGameActivity() {
 
 		saveGamesToDisk();
 	};
+
+	fetchGames();
 
 	setInterval(fetchGames, intervalMs);
 }
